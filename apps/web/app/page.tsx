@@ -11,9 +11,16 @@ type Message = {
 	id: number;
 	text: string;
 	sent: boolean;
+	timestamp: Date;
 };
 
-function MessageContent({ text }: { text: string }) {
+function MessageContent({
+	text,
+	timestamp,
+}: {
+	text: string;
+	timestamp: Date;
+}) {
 	const [expanded, setExpanded] = useState(false);
 	const [showReadMore, setShowReadMore] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
@@ -28,6 +35,13 @@ function MessageContent({ text }: { text: string }) {
 		}
 	}, [text]);
 
+	const formatTime = (date: Date) => {
+		return date.toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	};
+
 	return (
 		<div>
 			<div
@@ -38,36 +52,58 @@ function MessageContent({ text }: { text: string }) {
 			>
 				{text}
 			</div>
-			{showReadMore && (
-				<Button
-					variant="link"
-					className="p-0 h-auto font-normal text-default"
-					onClick={() => setExpanded(!expanded)}
-				>
-					{expanded ? (
-						<>
-							Read less <ChevronUp className="h-4 w-4 ml-1" />
-						</>
-					) : (
-						<>
-							Read more <ChevronDown className="h-4 w-4 ml-1" />
-						</>
-					)}
-				</Button>
-			)}
+			<div className="flex justify-between items-center mt-1">
+				{showReadMore && (
+					<Button
+						variant="link"
+						className="p-0 h-auto font-normal text-default"
+						onClick={() => setExpanded(!expanded)}
+					>
+						{expanded ? (
+							<>
+								Read less <ChevronUp className="h-3 w-3 ml-1" />
+							</>
+						) : (
+							<>
+								Read more{" "}
+								<ChevronDown className="h-3 w-3 ml-1" />
+							</>
+						)}
+					</Button>
+				)}
+				<span className="text-xs text-muted-foreground ml-auto">
+					{formatTime(timestamp)}
+				</span>
+			</div>
 		</div>
 	);
 }
 
 export default function ChatRoom() {
 	const [messages, setMessages] = useState<Message[]>([
-		{ id: 1, text: "Hello!", sent: false },
-		{ id: 2, text: "Hi there!", sent: true },
-		{ id: 3, text: "How are you?", sent: false },
+		{
+			id: 1,
+			text: "Hello!",
+			sent: false,
+			timestamp: new Date(Date.now() - 3600000),
+		},
+		{
+			id: 2,
+			text: "Hi there!",
+			sent: true,
+			timestamp: new Date(Date.now() - 3540000),
+		},
+		{
+			id: 3,
+			text: "How are you?",
+			sent: false,
+			timestamp: new Date(Date.now() - 3480000),
+		},
 		{
 			id: 4,
 			text: "I'm doing great, thanks! Here's a long message to demonstrate the new feature. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
 			sent: true,
+			timestamp: new Date(Date.now() - 3420000),
 		},
 	]);
 	const [inputMessage, setInputMessage] = useState("");
@@ -82,7 +118,12 @@ export default function ChatRoom() {
 		if (inputMessage.trim()) {
 			setMessages([
 				...messages,
-				{ id: messages.length + 1, text: inputMessage, sent: true },
+				{
+					id: messages.length + 1,
+					text: inputMessage,
+					sent: true,
+					timestamp: new Date(),
+				},
 			]);
 			setInputMessage("");
 		}
@@ -93,6 +134,7 @@ export default function ChatRoom() {
 			id: messages.length + 1,
 			text: "This is a received message. It can also be quite long to demonstrate the 'Read more' functionality for received messages as well. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
 			sent: false,
+			timestamp: new Date(),
 		};
 		setMessages([...messages, newMessage]);
 	};
@@ -124,7 +166,10 @@ export default function ChatRoom() {
 										: "bg-secondary text-secondary-foreground rounded-tl-none"
 								}`}
 							>
-								<MessageContent text={message.text} />
+								<MessageContent
+									text={message.text}
+									timestamp={message.timestamp}
+								/>
 								<div
 									className={`absolute top-0 w-4 h-4 ${
 										message.sent
