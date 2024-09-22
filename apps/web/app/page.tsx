@@ -129,21 +129,10 @@ export default function ChatRoom() {
 		}
 	};
 
-	const handleReceiveMessage = () => {
-		const newMessage = {
-			id: messages.length + 1,
-			text: "This is a received message. It can also be quite long to demonstrate the 'Read more' functionality for received messages as well. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-			sent: false,
-			timestamp: new Date(),
-		};
-		setMessages([...messages, newMessage]);
-	};
-
 	return (
 		<div className="flex flex-col h-screen max-w-md mx-auto border rounded-lg overflow-hidden">
-			<div className="bg-primary text-primary-foreground p-4 flex items-center">
-				<UserCircle className="w-8 h-8 mr-2" />
-				<h1 className="text-xl font-bold">Chat Room</h1>
+			<div className="bg-primary text-primary-foreground p-4 flex items-center justify-center italic">
+				<h1 className="text-xl font-bold font-roboto">E-Connect</h1>
 			</div>
 
 			<ScrollArea className="flex-grow relative" ref={scrollAreaRef}>
@@ -187,32 +176,26 @@ export default function ChatRoom() {
 					))}
 				</div>
 			</ScrollArea>
-			<div className="p-4 bg-muted">
-				<div className="flex space-x-2">
+			<div className="p-4">
+				<div className="flex space-x-4">
 					<Input
 						type="text"
 						placeholder="Type a message..."
 						value={inputMessage}
 						onChange={(e) => setInputMessage(e.target.value)}
-						onKeyPress={(e) => {
+						onKeyDown={(e) => {
 							if (e.key === "Enter") {
 								handleSendMessage();
 							}
 						}}
+						className="h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-md"
 					/>
-					<Button onClick={handleSendMessage} size="icon">
-						<Send className="h-4 w-4" />
-						<span className="sr-only">Send message</span>
-					</Button>
 					<Button
-						onClick={handleReceiveMessage}
-						variant="outline"
-						size="icon"
+						onClick={handleSendMessage}
+						className="h-12 w-12 bg-primary text-white rounded-md flex items-center justify-center hover:bg-primary-dark"
 					>
-						<UserCircle className="h-4 w-4" />
-						<span className="sr-only">
-							Simulate received message
-						</span>
+						<Send className="h-6 w-6" />
+						<span className="sr-only">Send message</span>
 					</Button>
 				</div>
 			</div>
