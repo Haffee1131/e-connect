@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light Mode */
+:root {
+	--radius: 8px;
+
+	/* Background and Foreground */
+	--background: 0, 0%, 100%; /* White */
+	--foreground: 220, 13%, 13%; /* Dark Text */
+
+	/* Card */
+	--card: 220, 13%, 95%; /* Light Gray */
+	--card-foreground: 220, 13%, 13%;
+
+	/* Popover */
+	--popover: 220, 13%, 100%;
+	--popover-foreground: 220, 13%, 13%;
+
+	/* Primary */
+	--primary-light: green; /*Light Blue*/
+	--primary: '#db1e43'; /*Blue*/
+	--primary-dark: 220, 90%, 40%; /* Dark Blue */
+	--primary-foreground: 0, 0%, 100%; /* White */
+
+	/* Secondary */
+	--secondary-light: 200, 10%, 90%; /* Light Gray */
+	--secondary: 200, 10%, 60%; /* Gray */
+	--secondary-dark: 200, 10%, 50%; /* Dark Gray */
+	--secondary-foreground: 220, 13%, 13%; /* Dark Text */
+
+	/* Other Colors */
+	--border: 220, 13%, 90%; /* Light Gray Border */
+	--input: 220, 13%, 98%; /* Very Light Input Background */
+	--ring: 220, 90%, 50%; /* Blue Ring */
+}

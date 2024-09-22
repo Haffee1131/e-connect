@@ -1,99 +1,176 @@
-import Image from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { useState, useRef, useEffect } from "react";
+import { UserCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file-text.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+type Message = {
+	id: number;
+	text: string;
+	sent: boolean;
+};
+
+function MessageContent({ text }: { text: string }) {
+	const [expanded, setExpanded] = useState(false);
+	const [showReadMore, setShowReadMore] = useState(false);
+	const contentRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (contentRef.current) {
+			const lineHeight = parseInt(
+				getComputedStyle(contentRef.current).lineHeight
+			);
+			const maxHeight = lineHeight * 5;
+			setShowReadMore(contentRef.current.scrollHeight > maxHeight);
+		}
+	}, [text]);
+
+	return (
+		<div>
+			<div
+				ref={contentRef}
+				className={`overflow-hidden transition-all duration-300 ease-in-out ${
+					expanded ? "max-h-full" : "max-h-[7.5em]"
+				}`}
+			>
+				{text}
+			</div>
+			{showReadMore && (
+				<Button
+					variant="link"
+					className="p-0 h-auto font-normal text-default"
+					onClick={() => setExpanded(!expanded)}
+				>
+					{expanded ? (
+						<>
+							Read less <ChevronUp className="h-4 w-4 ml-1" />
+						</>
+					) : (
+						<>
+							Read more <ChevronDown className="h-4 w-4 ml-1" />
+						</>
+					)}
+				</Button>
+			)}
+		</div>
+	);
+}
+
+export default function ChatRoom() {
+	const [messages, setMessages] = useState<Message[]>([
+		{ id: 1, text: "Hello!", sent: false },
+		{ id: 2, text: "Hi there!", sent: true },
+		{ id: 3, text: "How are you?", sent: false },
+		{
+			id: 4,
+			text: "I'm doing great, thanks! Here's a long message to demonstrate the new feature. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+			sent: true,
+		},
+	]);
+	const [inputMessage, setInputMessage] = useState("");
+	const scrollAreaRef = useRef<HTMLDivElement>(null);
+	const lastMessageRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
+
+	const handleSendMessage = () => {
+		if (inputMessage.trim()) {
+			setMessages([
+				...messages,
+				{ id: messages.length + 1, text: inputMessage, sent: true },
+			]);
+			setInputMessage("");
+		}
+	};
+
+	const handleReceiveMessage = () => {
+		const newMessage = {
+			id: messages.length + 1,
+			text: "This is a received message. It can also be quite long to demonstrate the 'Read more' functionality for received messages as well. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			sent: false,
+		};
+		setMessages([...messages, newMessage]);
+	};
+
+	return (
+		<div className="flex flex-col h-screen max-w-md mx-auto border rounded-lg overflow-hidden">
+			<div className="bg-primary text-primary-foreground p-4 flex items-center">
+				<UserCircle className="w-8 h-8 mr-2" />
+				<h1 className="text-xl font-bold">Chat Room</h1>
+			</div>
+
+			<ScrollArea className="flex-grow relative" ref={scrollAreaRef}>
+				<div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+				<div className="p-4 space-y-4">
+					{messages.map((message, index) => (
+						<div
+							key={message.id}
+							className={`flex ${message.sent ? "justify-end" : "justify-start"}`}
+							ref={
+								index === messages.length - 1
+									? lastMessageRef
+									: null
+							}
+						>
+							<div
+								className={`relative max-w-[70%] p-3 rounded-lg ${
+									message.sent
+										? "bg-primary text-primary-foreground rounded-tr-none"
+										: "bg-secondary text-secondary-foreground rounded-tl-none"
+								}`}
+							>
+								<MessageContent text={message.text} />
+								<div
+									className={`absolute top-0 w-4 h-4 ${
+										message.sent
+											? "-right-2 bg-primary"
+											: "-left-2 bg-secondary"
+									}`}
+									style={{
+										clipPath: message.sent
+											? "polygon(0 0, 0% 100%, 100% 0)"
+											: "polygon(100% 0, 0 0, 100% 100%)",
+									}}
+								/>
+							</div>
+						</div>
+					))}
+				</div>
+			</ScrollArea>
+			<div className="p-4 bg-muted">
+				<div className="flex space-x-2">
+					<Input
+						type="text"
+						placeholder="Type a message..."
+						value={inputMessage}
+						onChange={(e) => setInputMessage(e.target.value)}
+						onKeyPress={(e) => {
+							if (e.key === "Enter") {
+								handleSendMessage();
+							}
+						}}
+					/>
+					<Button onClick={handleSendMessage} size="icon">
+						<Send className="h-4 w-4" />
+						<span className="sr-only">Send message</span>
+					</Button>
+					<Button
+						onClick={handleReceiveMessage}
+						variant="outline"
+						size="icon"
+					>
+						<UserCircle className="h-4 w-4" />
+						<span className="sr-only">
+							Simulate received message
+						</span>
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
 }
