@@ -1,10 +1,21 @@
 import express, { Request, Response } from "express";
+import http from "http";
 
-async function init() {
+import SocketService from "./services/socket";
+
+function init() {
+	// Express server
 	const app = express();
-	const PORT = process.env.PORT ?? 3001;
-
+	const PORT = process.env.PORT ?? 3005;
 	app.use(express.json());
+
+	// Http server
+	const httpServer = http.createServer(app);
+
+	// Socket server
+	const socketService = new SocketService();
+	socketService.io.attach(httpServer);
+	socketService.initListeners();
 
 	// Home Page
 	app.get("/", (_: Request, res: Response) => {
@@ -12,11 +23,9 @@ async function init() {
 	});
 
 	// Start the server
-	if (process.env.NODE_ENV !== "test") {
-		app.listen(PORT, () => {
-			console.log(`Server is running on http://localhost:${PORT}`);
-		});
-	}
+	app.listen(PORT, () => {
+		console.log(`Server is running on http://localhost:${PORT}`);
+	});
 }
 
 init();
