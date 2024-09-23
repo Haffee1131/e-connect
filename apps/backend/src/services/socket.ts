@@ -15,9 +15,9 @@ class SocketService {
 		this._io = new Server(server, {
 			connectionStateRecovery: {},
 			cors: {
-				origin: "http://localhost:3000", // Allow requests from frontend
-				methods: ["GET", "POST"],
-				credentials: true,
+				origin: "*", // Allow requests from frontend
+				methods: ["*"],
+				// credentials: true,
 			},
 		});
 	}

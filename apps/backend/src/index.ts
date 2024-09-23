@@ -13,9 +13,9 @@ async function init() {
 	// Add CORS middleware to allow requests from localhost:3000
 	app.use(
 		cors({
-			origin: "http://localhost:3000", // The frontend URL
-			methods: ["GET", "POST"],
-			credentials: true,
+			origin: "*", // The frontend URL
+			methods: ["*"],
+			// credentials: true,
 		})
 	);
 

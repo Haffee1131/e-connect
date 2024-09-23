@@ -82,34 +82,8 @@ function MessageContent({
 }
 
 export default function ChatRoom() {
-	const { sendMessage } = useSocket();
+	const { messages, sendMessage } = useSocket();
 
-	const [messages, setMessages] = useState<IMessage[]>([
-		{
-			id: 1,
-			text: "Hello!",
-			sent: false,
-			timestamp: new Date(Date.now() - 3600000),
-		},
-		{
-			id: 2,
-			text: "Hi there!",
-			sent: true,
-			timestamp: new Date(Date.now() - 3540000),
-		},
-		{
-			id: 3,
-			text: "How are you?",
-			sent: false,
-			timestamp: new Date(Date.now() - 3480000),
-		},
-		{
-			id: 4,
-			text: "I'm doing great, thanks! Here's a long message to demonstrate the new feature. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-			sent: true,
-			timestamp: new Date(Date.now() - 3420000),
-		},
-	]);
 	const [inputMessage, setInputMessage] = useState("");
 	const scrollAreaRef = useRef<HTMLDivElement>(null);
 	const lastMessageRef = useRef<HTMLDivElement>(null);
@@ -120,18 +94,9 @@ export default function ChatRoom() {
 
 	const handleSendMessage = () => {
 		if (inputMessage.trim()) {
-			setMessages([
-				...messages,
-				{
-					id: messages.length + 1,
-					text: inputMessage,
-					sent: true,
-					timestamp: new Date(),
-				},
-			]);
 			sendMessage({
 				id: messages.length + 1,
-				text: inputMessage,
+				text: inputMessage.trim(),
 				sent: true,
 				timestamp: new Date(),
 			});
@@ -142,7 +107,7 @@ export default function ChatRoom() {
 	return (
 		<div className="flex flex-col h-screen max-w-md mx-auto border rounded-lg overflow-hidden">
 			<div className="bg-primary text-primary-foreground p-4 flex items-center justify-center italic">
-				<h1 className="text-xl font-bold font-roboto">E-Connect</h1>
+				<h1 className="text-xl font-bold">E-Connect</h1>
 			</div>
 
 			<ScrollArea className="flex-grow relative" ref={scrollAreaRef}>
