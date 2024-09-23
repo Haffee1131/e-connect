@@ -1,18 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { UserCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
+import { Send, ChevronDown, ChevronUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSocket } from "@/contexts/SocketContext";
 
-type Message = {
+interface IMessage {
 	id: number;
 	text: string;
 	sent: boolean;
 	timestamp: Date;
-};
+}
 
 function MessageContent({
 	text,
@@ -39,6 +40,7 @@ function MessageContent({
 		return date.toLocaleTimeString([], {
 			hour: "2-digit",
 			minute: "2-digit",
+			hour12: false,
 		});
 	};
 
@@ -80,7 +82,9 @@ function MessageContent({
 }
 
 export default function ChatRoom() {
-	const [messages, setMessages] = useState<Message[]>([
+	const { sendMessage } = useSocket();
+
+	const [messages, setMessages] = useState<IMessage[]>([
 		{
 			id: 1,
 			text: "Hello!",
@@ -125,6 +129,12 @@ export default function ChatRoom() {
 					timestamp: new Date(),
 				},
 			]);
+			sendMessage({
+				id: messages.length + 1,
+				text: inputMessage,
+				sent: true,
+				timestamp: new Date(),
+			});
 			setInputMessage("");
 		}
 	};
