@@ -1,21 +1,21 @@
 import express, { Request, Response } from "express";
 import http from "http";
+import dotenv from "dotenv";
 
 import SocketService from "./services/socket";
 
-function init() {
-	// Express server
+async function init() {
+	// Express Server
 	const app = express();
-	const PORT = process.env.PORT ?? 3005;
-	app.use(express.json());
 
-	// Http server
+	// HTTP Server
 	const httpServer = http.createServer(app);
+	dotenv.config();
+	const HTTP_SERVER_PORT = process.env.HTTP_SERVER_PORT ?? 8000;
 
 	// Socket server
-	const socketService = new SocketService();
+	const socketService = new SocketService(httpServer);
 	socketService.io.attach(httpServer);
-	socketService.initListeners();
 
 	// Home Page
 	app.get("/", (_: Request, res: Response) => {
@@ -23,9 +23,13 @@ function init() {
 	});
 
 	// Start the server
-	app.listen(PORT, () => {
-		console.log(`Server is running on http://localhost:${PORT}`);
+	httpServer.listen(HTTP_SERVER_PORT, () => {
+		console.log(
+			`HTTP Server is running on http://localhost:${HTTP_SERVER_PORT}`
+		);
 	});
+
+	socketService.initListeners();
 }
 
 init();

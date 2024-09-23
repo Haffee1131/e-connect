@@ -1,11 +1,24 @@
 import { Server, Socket } from "socket.io";
 
+interface IMessage {
+	id: number;
+	text: string;
+	sent: boolean;
+	timestamp: Date;
+}
+
 class SocketService {
 	private _io: Server;
 
-	constructor() {
+	constructor(server: any) {
 		console.log("Initializing socket server...");
-		this._io = new Server();
+		this._io = new Server(server, {
+			connectionStateRecovery: {},
+			cors: {
+				allowedHeaders: ["*"],
+				origin: "*",
+			},
+		});
 	}
 
 	get io() {
@@ -14,13 +27,29 @@ class SocketService {
 
 	public initListeners() {
 		const io = this._io;
-		console.log("Socket listeners initializing...: ");
+		console.log("Socket listeners initializing...");
 
-		io.on("connect", (socket: Socket) => {
-			console.log("New Socket: ", socket.id);
+		io.on("connection", (socket: Socket) => {
+			console.log("New Socket Connected: ", socket.id);
 
-			socket.on("event:message", async (message: string) => {
-				console.log("Received message: ", message);
+			if (!socket) console.log("Backend Socket Undefined!");
+
+			socket.on("event:message", ({ message }: { message: IMessage }) => {
+				console.log("New message received: ", message);
+				// io.emit("event:message", message);
+			});
+
+			socket.emit("event:message", {
+				message: {
+					id: 200,
+					text: "Message from Server",
+					sent: true,
+					timestamp: Date.now(),
+				},
+			});
+
+			socket.on("disconnect", () => {
+				console.log("Socket Disconnected: ", socket.id);
 			});
 		});
 	}
