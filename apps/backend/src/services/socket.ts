@@ -15,8 +15,9 @@ class SocketService {
 		this._io = new Server(server, {
 			connectionStateRecovery: {},
 			cors: {
-				allowedHeaders: ["*"],
-				origin: "*",
+				origin: "http://localhost:3000", // Allow requests from frontend
+				methods: ["GET", "POST"],
+				credentials: true,
 			},
 		});
 	}
@@ -29,24 +30,25 @@ class SocketService {
 		const io = this._io;
 		console.log("Socket listeners initializing...");
 
-		io.on("connection", (socket: Socket) => {
+		io.on("connection", async (socket) => {
 			console.log("New Socket Connected: ", socket.id);
 
 			if (!socket) console.log("Backend Socket Undefined!");
 
 			socket.on("event:message", ({ message }: { message: IMessage }) => {
-				console.log("New message received: ", message);
-				// io.emit("event:message", message);
+				console.log("Message received from client: ", message);
+				socket.broadcast.emit("event:message", message);
 			});
 
-			socket.emit("event:message", {
-				message: {
-					id: 200,
-					text: "Message from Server",
-					sent: true,
-					timestamp: Date.now(),
-				},
-			});
+			// // Send the message back to all clients (including the sender)
+			// socket.emit("event:message", {
+			// 	message: {
+			// 		id: 200,
+			// 		text: "Message from Server",
+			// 		sent: true,
+			// 		timestamp: Date.now(),
+			// 	},
+			// });
 
 			socket.on("disconnect", () => {
 				console.log("Socket Disconnected: ", socket.id);

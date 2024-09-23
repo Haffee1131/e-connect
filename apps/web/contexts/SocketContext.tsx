@@ -2,6 +2,8 @@
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import dotenv from "dotenv";
+dotenv.config();
 
 type TSocketProviderProps = {
 	children?: React.ReactNode;
@@ -36,42 +38,51 @@ export const SocketProvider: React.FC<TSocketProviderProps> = ({
 	const [socket, setSocket] = useState<Socket>();
 
 	useEffect(() => {
-		const _socket = io(process.env.BACKEND_URL ?? "http://localhost:8000");
-		console.log("Client Socket Initializing...");
-
-		_socket.emit("event:message", {
-			message: {
-				id: 100,
-				text: "Message from Client",
-				sent: true,
-				timestamp: Date.now(),
-			},
+		const _socket = io(process.env.BACKEND_URL ?? "http://localhost:8000", {
+			transports: ["websocket"],
 		});
+		setSocket(_socket);
 
-		_socket.on("event:message", ({ message }: { message: IMessage }) => {
-			console.log("Client side message received: ", message);
-			// io.emit("event:message", message);
-		});
+		console.log("Connecting to Server...", _socket);
 
-		setSocket(socket);
+		// socket.emit("event:message", {
+		// 	message: {
+		// 		id: 100,
+		// 		text: "Message from Client",
+		// 		sent: true,
+		// 		timestamp: Date.now(),
+		// 	},
+		// });
+
+		// _socket.on("event:message", ({ message }: { message: IMessage }) => {
+		// 	console.log("Message received from server: ", message);
+		// 	// io.emit("event:message", message);
+		// });
+
+		_socket.on("event:message", onMessageReceived);
 
 		return () => {
 			_socket.disconnect();
+			_socket.off("event:message", onMessageReceived);
 			setSocket(undefined);
 			console.log("Client Socket Disconnected");
 		};
 	}, []);
 
 	const sendMessage: ISocketContext["sendMessage"] = useCallback(
-		(msg: IMessage) => {
-			console.log("Sent Message: ", msg);
+		(message: IMessage) => {
+			console.log("Sent Message: ", message.text);
 			if (!socket) throw new Error("No Socket!!");
 
-			socket.emit("event:message", { message: msg });
+			socket.emit("event:message", { message: message });
 			console.log("Message Emitted.");
 		},
 		[socket]
 	);
+
+	const onMessageReceived = useCallback((message: IMessage) => {
+		console.log("Message received from server: ", message);
+	}, []);
 
 	return (
 		<SocketContext.Provider value={{ sendMessage }}>
