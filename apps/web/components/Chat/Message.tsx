@@ -8,10 +8,10 @@ interface MessageProps {
 export function Message({ message }: MessageProps) {
 	return (
 		<MessageContent
-			text={message.text}
+			text={message.text || "Hey, there!"}
 			timestamp={message.timestamp}
 			userName={message.userName || "Unknown"}
-			sent={message.sent}
+			sent={message.sent || false}
 		/>
 	);
 }

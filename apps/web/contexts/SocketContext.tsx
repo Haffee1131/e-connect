@@ -5,6 +5,7 @@ import { io, Socket } from "socket.io-client";
 
 type TSocketProviderProps = {
 	children: React.ReactNode;
+	userName: string; // Added to pass username
 };
 
 interface IMessage {
@@ -17,7 +18,7 @@ interface IMessage {
 
 interface ISocketContext {
 	messages: IMessage[];
-	sendMessage: (message: IMessage) => void;
+	sendMessage: (messageText: string) => void; // Updated type
 }
 
 const SocketContext = React.createContext<ISocketContext | undefined>(
@@ -69,6 +70,7 @@ class SocketManager {
 
 export const SocketProvider: React.FC<TSocketProviderProps> = ({
 	children,
+	userName,
 }) => {
 	const [messages, setMessages] = useState<IMessage[]>([
 		{
@@ -109,11 +111,19 @@ export const SocketProvider: React.FC<TSocketProviderProps> = ({
 	}, []);
 
 	const sendMessage: ISocketContext["sendMessage"] = useCallback(
-		(message: IMessage) => {
-			setMessages((prev) => [...prev, { ...message, sent: true }]);
+		(messageText: string) => {
+			const message: IMessage = {
+				id: messages.length + 1,
+				text: messageText,
+				userName,
+				sent: true,
+				timestamp: new Date(),
+			};
+
+			setMessages((prev) => [...prev, message]);
 			socketManager?.emit("event:message", message);
 		},
-		[socketManager]
+		[socketManager, messages, userName]
 	);
 
 	return (

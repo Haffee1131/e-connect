@@ -37,7 +37,7 @@ export function MessageContent({
 		>
 			<AvatarComponent userName={userName} sent={sent} />
 			<div
-				className={`relative max-w-[70%] p-3 rounded-lg ${sent ? "bg-primary text-white" : "bg-secondary text-black"}`}
+				className={`relative max-w-[70%] p-3 rounded-lg ${sent ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-background"}`}
 			>
 				<div className="mb-1">
 					<span className="text-md font-bold">{userName}</span>
@@ -56,7 +56,14 @@ export function MessageContent({
 							setExpanded={setExpanded}
 						/>
 					)}
-					<span className="text-xs text-muted-foreground ml-auto">
+					<span
+						className={`text-xs text-muted-foreground ml-auto ${
+							sent
+								? "text-primary-foreground"
+								: "text-muted-foreground"
+						}
+					`}
+					>
 						{formatTime(timestamp)}
 					</span>
 				</div>

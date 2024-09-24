@@ -9,6 +9,8 @@ import { Message } from "@/components/Chat/Message";
 import { useSocket } from "@/contexts/SocketContext";
 import { IMessage } from "@/services/MessageService";
 
+import "../../app/globals.css";
+
 export default function ChatRoom() {
 	const { messages, sendMessage } = useSocket();
 
@@ -21,13 +23,7 @@ export default function ChatRoom() {
 
 	const handleSendMessage = () => {
 		if (inputMessage.trim()) {
-			sendMessage({
-				id: messages.length + 1,
-				text: inputMessage.trim(),
-				userName: "Server",
-				sent: true,
-				timestamp: new Date(),
-			});
+			sendMessage(inputMessage.trim());
 			setInputMessage("");
 		}
 	};
