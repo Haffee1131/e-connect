@@ -20,7 +20,7 @@
 
 	/* Primary */
 	--primary-light: green; /*Light Blue*/
-	--primary: '#db1e43'; /*Blue*/
+	--primary: "#db1e43"; /*Blue*/
 	--primary-dark: 220, 90%, 40%; /* Dark Blue */
 	--primary-foreground: 0, 0%, 100%; /* White */
 

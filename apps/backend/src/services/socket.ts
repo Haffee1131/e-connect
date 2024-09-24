@@ -3,6 +3,7 @@ import { Server, Socket } from "socket.io";
 interface IMessage {
 	id: number;
 	text: string;
+	userName: string;
 	sent: boolean;
 	timestamp: Date;
 }
