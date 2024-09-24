@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, ChevronDown, ChevronUp } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSocket } from "@/contexts/SocketContext";
 
 interface IMessage {
@@ -13,18 +13,37 @@ interface IMessage {
 	text: string;
 	sent: boolean;
 	timestamp: Date;
+	userName: string;
 }
 
-function MessageContent({
-	text,
-	timestamp,
-}: {
+function getRandomColor() {
+	const hue = Math.floor(Math.random() * 360);
+	const saturation = 70;
+	const lightness = 60;
+	return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+interface IMessageContentProps {
 	text: string;
 	timestamp: Date;
-}) {
+	userName: string;
+	sent: boolean;
+}
+
+export function MessageContent({
+	text = "Hey!",
+	timestamp,
+	userName = "Server",
+	sent = false,
+}: IMessageContentProps) {
 	const [expanded, setExpanded] = useState(false);
 	const [showReadMore, setShowReadMore] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
+	const [avatarColor, setAvatarColor] = useState<string>("");
+
+	useEffect(() => {
+		setAvatarColor(getRandomColor());
+	}, []);
 
 	useEffect(() => {
 		if (contentRef.current) {
@@ -45,37 +64,87 @@ function MessageContent({
 	};
 
 	return (
-		<div>
-			<div
-				ref={contentRef}
-				className={`overflow-hidden transition-all duration-300 ease-in-out ${
-					expanded ? "max-h-full" : "max-h-[7.5em]"
-				}`}
+		<div
+			className={`flex items-start ${sent ? "flex-row-reverse" : "flex-row"}`}
+		>
+			<Avatar
+				className={`w-7 h-7 ${sent ? "ml-2" : "mr-2"}`}
+				style={{ backgroundColor: avatarColor }}
 			>
-				{text}
-			</div>
-			<div className="flex justify-between items-center mt-1">
-				{showReadMore && (
-					<Button
-						variant="link"
-						className="p-0 h-auto font-normal text-default"
-						onClick={() => setExpanded(!expanded)}
-					>
-						{expanded ? (
-							<>
-								Read less <ChevronUp className="h-3 w-3 ml-1" />
-							</>
-						) : (
-							<>
-								Read more{" "}
-								<ChevronDown className="h-3 w-3 ml-1" />
-							</>
-						)}
-					</Button>
-				)}
-				<span className="text-xs text-muted-foreground ml-auto">
-					{formatTime(timestamp)}
-				</span>
+				<AvatarImage
+					src={`https://api.dicebear.com/6.x/initials/svg?seed=${userName}`}
+					alt={userName}
+				/>
+				<AvatarFallback
+					style={{
+						backgroundColor: avatarColor,
+						color: "white",
+					}}
+				>
+					{userName.charAt(0)}
+				</AvatarFallback>
+			</Avatar>
+			<div
+				className={`relative max-w-[70%] p-3 rounded-lg 
+			${
+				sent
+					? "bg-primary text-white rounded-tr-none"
+					: "bg-secondary text-black rounded-tl-none"
+			}
+		  `}
+			>
+				<div className="mb-1">
+					<span className="text-md font-bold">{userName}</span>
+				</div>
+
+				<div
+					ref={contentRef}
+					className={`overflow-hidden transition-all duration-300 ease-in-out ${
+						expanded ? "max-h-full" : "max-h-[7.5em]"
+					}`}
+					style={{
+						wordBreak: "break-word",
+						overflowWrap: "break-word",
+					}}
+				>
+					<div className="break-words whitespace-pre-wrap">
+						{text}
+					</div>
+				</div>
+				<div className="flex justify-between items-center mt-1">
+					{showReadMore && (
+						<Button
+							variant="link"
+							className="p-0 h-auto font-normal text-default"
+							onClick={() => setExpanded(!expanded)}
+						>
+							{expanded ? (
+								<>
+									Read less{" "}
+									<ChevronUp className="h-3 w-3 ml-1" />
+								</>
+							) : (
+								<>
+									Read more{" "}
+									<ChevronDown className="h-3 w-3 ml-1" />
+								</>
+							)}
+						</Button>
+					)}
+					<span className="text-xs text-muted-foreground ml-auto">
+						{formatTime(timestamp)}
+					</span>
+				</div>
+				<div
+					className={`absolute top-0 w-4 h-4 ${
+						sent ? "-right-2 bg-primary" : "-left-2 bg-secondary"
+					}`}
+					style={{
+						clipPath: sent
+							? "polygon(0 0, 0% 100%, 100% 0)"
+							: "polygon(100% 0, 0 0, 100% 100%)",
+					}}
+				/>
 			</div>
 		</div>
 	);
@@ -112,41 +181,22 @@ export default function ChatRoom() {
 
 			<ScrollArea className="flex-grow relative" ref={scrollAreaRef}>
 				<div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-				<div className="p-4 space-y-4">
+				<div className="p-3 space-y-3">
 					{messages.map((message, index) => (
 						<div
 							key={message.id}
-							className={`flex ${message.sent ? "justify-end" : "justify-start"}`}
 							ref={
 								index === messages.length - 1
 									? lastMessageRef
 									: null
 							}
 						>
-							<div
-								className={`relative max-w-[70%] p-3 rounded-lg ${
-									message.sent
-										? "bg-primary text-primary-foreground rounded-tr-none"
-										: "bg-secondary text-secondary-foreground rounded-tl-none"
-								}`}
-							>
-								<MessageContent
-									text={message.text}
-									timestamp={message.timestamp}
-								/>
-								<div
-									className={`absolute top-0 w-4 h-4 ${
-										message.sent
-											? "-right-2 bg-primary"
-											: "-left-2 bg-secondary"
-									}`}
-									style={{
-										clipPath: message.sent
-											? "polygon(0 0, 0% 100%, 100% 0)"
-											: "polygon(100% 0, 0 0, 100% 100%)",
-									}}
-								/>
-							</div>
+							<MessageContent
+								text={message.text}
+								timestamp={message.timestamp}
+								userName={"Hafeez"}
+								sent={message.sent}
+							/>
 						</div>
 					))}
 				</div>
