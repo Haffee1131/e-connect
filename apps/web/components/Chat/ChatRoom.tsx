@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 
@@ -7,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message } from "@/components/Chat/Message";
 import { useSocket } from "@/contexts/SocketContext";
-import { IMessage } from "@/services/MessageService";
 
 import "../../app/globals.css";
 
@@ -15,6 +15,7 @@ export default function ChatRoom() {
 	const { messages, sendMessage } = useSocket();
 
 	const [inputMessage, setInputMessage] = useState("");
+	const inputRef = useRef<HTMLInputElement>(null);
 	const lastMessageRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -25,11 +26,19 @@ export default function ChatRoom() {
 		if (inputMessage.trim()) {
 			sendMessage(inputMessage.trim());
 			setInputMessage("");
+			inputRef.current?.focus();
 		}
 	};
 
 	return (
-		<div className="flex flex-col h-screen max-w-md mx-auto border rounded-lg overflow-hidden">
+		<div
+			className="flex flex-col h-screen max-w-md mx-auto border rounded-lg overflow-hidden"
+			style={{
+				backgroundImage: `url('/chat-room-bg.jpeg')`,
+				backgroundSize: "cover",
+				backgroundPosition: "center",
+			}}
+		>
 			<header className="bg-primary text-primary-foreground p-4 flex items-center justify-center italic">
 				<h1 className="text-xl font-bold">E-Connect</h1>
 			</header>
@@ -38,7 +47,7 @@ export default function ChatRoom() {
 				<div className="p-3 space-y-3">
 					{messages.map((message, index) => (
 						<div
-							key={message.id}
+							key={index}
 							ref={
 								index === messages.length - 1
 									? lastMessageRef
@@ -50,10 +59,10 @@ export default function ChatRoom() {
 					))}
 				</div>
 			</ScrollArea>
-
 			<footer className="p-4">
 				<div className="flex space-x-4">
 					<Input
+						ref={inputRef}
 						type="text"
 						placeholder="Type a message..."
 						value={inputMessage}
@@ -63,7 +72,7 @@ export default function ChatRoom() {
 								handleSendMessage();
 							}
 						}}
-						className="h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-md"
+						className="h-12 px-4 border border-white bg-gray rounded-md focus:outline-none focus:border-white focus:ring-1 focus:ring-white placeholder:text-gray-700"
 					/>
 					<Button
 						onClick={handleSendMessage}

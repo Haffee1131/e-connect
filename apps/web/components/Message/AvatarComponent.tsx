@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getHashedColor } from "@/utils/ColorUtils";
 
 interface AvatarProps {
@@ -20,7 +20,6 @@ export function AvatarComponent({ userName, sent }: AvatarProps) {
 			className={`w-7 h-7 ${sent ? "ml-2" : "mr-2"}`}
 			style={{ backgroundColor: avatarColor }}
 		>
-			{/* <AvatarImage src={``} alt={userName} /> */}
 			<AvatarFallback
 				style={{ backgroundColor: avatarColor, color: "white" }}
 			>

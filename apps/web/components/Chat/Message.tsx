@@ -10,7 +10,7 @@ export function Message({ message }: MessageProps) {
 		<MessageContent
 			text={message.text || "Hey, there!"}
 			timestamp={message.timestamp}
-			userName={message.userName || "Unknown"}
+			userName={message.userName || "User"}
 			sent={message.sent || false}
 		/>
 	);
