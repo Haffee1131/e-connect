@@ -37,10 +37,8 @@ export default function Welcome() {
 	function onSubmit(values: z.infer<typeof formSchema>) {
 		if (!values) throw new Error(`Empty Values`);
 
-		console.log(values);
 		setUsername(values.username);
-		console.log(values.username);
-		router.replace("/chat");
+		router.push("/chat");
 	}
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">

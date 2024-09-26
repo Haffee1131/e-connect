@@ -10,12 +10,10 @@ async function init() {
 	// Express Server
 	const app = express();
 
-	// Add CORS middleware to allow requests from localhost:3000
 	app.use(
 		cors({
-			origin: "*", // The frontend URL
+			origin: "*",
 			methods: ["*"],
-			// credentials: true,
 		})
 	);
 
