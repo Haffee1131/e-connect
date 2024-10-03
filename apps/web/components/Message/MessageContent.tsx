@@ -45,7 +45,10 @@ export function MessageContent({
 				<div
 					ref={contentRef}
 					className={`overflow-hidden ${expanded ? "max-h-full" : "max-h-[7.5em]"}`}
-					style={{ wordBreak: "break-word" }}
+					style={{
+						wordBreak: "break-word",
+						overflowWrap: "break-word",
+					}}
 				>
 					{text}
 				</div>
